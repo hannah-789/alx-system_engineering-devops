@@ -1,28 +1,30 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# This Bash script retrieves DNS records for specified subdomains
 
-# Function to display information about a subdomain
-display_info() {
-    local sub_domain=$1
-    local domain=$2
-    local record_type=$(dig +short -t $3 $sub_domain.$domain)
-    local destination=$(dig +short $sub_domain.$domain)
+# Function to print DNS record information for a subdomain
+print_record_info() {
+    local domain="$1"
+    local subdomain="$2"
+    
+    # Retrieve DNS records for the subdomain
+    local dns_info=$(dig +short "$subdomain.$domain")
 
-    echo "The subdomain $sub_domain is a $record_type record and points to $destination"
+    # Extract record type and IP address
+    local record_type=$(echo "$dns_info" | awk '{print $1}')
+    local ip_address=$(echo "$dns_info" | awk '{print $2}')
+
+    # Print record information
+    echo "The subdomain $subdomain is a $record_type record and points to $ip_address"
 }
 
 # Main script
-if [ "$#" -eq 1 ]; then
-    domain=$1
-    subdomains=("www" "lb-01" "web-01" "web-02")
-    for sub in "${subdomains[@]}"; do
-        display_info $sub $domain A
+if [ -z "$2" ]; then
+    # If only domain provided, iterate through predefined subdomains
+    for sub in "www" "lb-01" "web-01" "web-02"; do
+        print_record_info "$1" "$sub"
     done
-elif [ "$#" -eq 2 ]; then
-    domain=$1
-    subdomain=$2
-    display_info $subdomain $domain A
 else
-    echo "Usage: $0 <domain> [subdomain]"
-    exit 1
+    # If both domain and subdomain provided, print info for the specified subdomain
+    print_record_info "$1" "$2"
 fi
 
