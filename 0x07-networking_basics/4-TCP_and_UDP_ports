@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# script displaying TCP/UDP listening ports
+listening_ports=$(netstat -tuln | grep 'LISTEN')
+
+# Loop through each line of the output
+while IFS= read -r line; do
+    # Extract the protocol, port, and PID from the line
+    protocol=$(echo "$line" | awk '{print $1}')
+    port=$(echo "$line" | awk '{print $4}' | awk -F':' '{print $NF}')
+    pid=$(echo "$line" | awk '{print $NF}')
+
+    # Get the program name associated with the PID
+    program=$(ps -p $pid -o comm=)
+
+    # Display the listening port, PID, and program name
+    echo "Protocol: $protocol, Port: $port, PID: $pid, Program: $program"
+
