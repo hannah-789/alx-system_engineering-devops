@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Displays all active IPv4 addresses on the machine.
+# Use the ip command to get IPv4 addresses and format output using awk and cut
+
+
+ip -4 -o addr show | awk '{print $4}' | cut -d "/" -f 1
+
